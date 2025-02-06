@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaSign Interactive Pitch Deck</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            overflow: hidden;
+        }
+        .slide-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: transparent;
+            background-img: url('https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/Pitch_Deck_-_Sprint_3.pptx__3_-removebg-preview.png?v=1725981925655'), url('https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/product-screenshot?v=1725982141807');
+            background-repeat: no-repeat;
+        }
+        .slide {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            transition: background 0.5s ease;
+        }
+        .slide h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .slide ul {
+            text-align: left;
+            font-size: 1.2rem;
+            list-style-type: none;
+            padding: 0;
+        }
+        .slide li {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f0f0f0;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .media-container {
+            max-width: 600px;
+            margin: 1rem 0;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .media-container img, .media-container video {
+            max-width: 100%;
+            height: auto;
+        }
+        .progress-bar {
+            height: 5px;
+            background-color: #007bff;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        .overview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow: auto;
+            padding: 2rem;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .overview-slide {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .overview-slide:hover {
+            transform: scale(1.05);
+        }
+        .overview-slide h3 {
+            font-size: 1rem;
+            margin: 0 0 0.5rem 0;
+        }
+        .close-overview {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div id="slide" class="slide"></div>
+        <div class="navigation">
+            <span id="slide-number"></span>
+            <div class="nav-buttons">
+                <button id="prev-btn">Previous</button>
+                <button id="next-btn">Next</button>
+                <button id="overview-btn">Overview</button>
+            </div>
+        </div>
+    </div>
+    <div id="overview" class="overview">
+        <div class="close-overview" id="close-overview">&times;</div>
+        <div class="overview-grid" id="overview-grid"></div>
+    </div>
+
+    <script>
+        const slides = [
+            {
+                title: "AquaSign: Data Accounting-as-a-Service",
+                content: "Powered by inblock.io assets GmbH",
+                background: "linear-gradient(to right, #3b82f6, #8b5cf6)",
+                media: {
+                    type: "image",
+                  //https://via.placeholder.com/600x300.png?text=AquaSign+Logo
+                    url: "https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/android-192x192.png?v=1725989753870"
+                }
+            },
+            {
+                title: "Problem",
+                content: [
+                    "Lack of trust in digital data integrity and provenance",
+                    "Difficulty in verifying and tracking changes to critical documents and files",
+                    "Challenges in securely sharing sensitive data across organizations",
+                    "Growing concerns about data sovereignty and regulatory compliance",
+                    "Increasing risk of fraud due to easy manipulation of digital records"
+                ],
+                background: "#fee2e2",
+                media: {
+                    type: "image",
+                    url: "https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/pain350x350.png?v=1725992036073"
+                }
+            },
+            {
+                title: "Solution",
+                content: [
+                    "Create tamper-evident records using the Aqua Protocol",
+                    "Blockchain timestamping for indisputable Proof of Existence (PoE)",
+                    "Aqua-Chain based access control and sharing policies",
+                    "User-controlled data sovereignty with offline and on-premise options",
+                    "Protection against data tampering without altering original data",
+                    "Building trust networks over time through increased accountability"
+                ],
+                background: "#dcfce7",
+                media: {
+                    //type: "video",
+                    //url: "https://example.com/solution-demo.mp4"
+                }
+            },
+            {
+                title: "Product: Open Source and decentralized DocuSign",
+                content: [
+                    "AquaSign Web Platform",
+                    "AquaSign Mobile App",
+                    "AquaSign API",
+                    "AquaSign Container + Guardian"
+                ],
+                background: "#fef9c3",
+                media: {
+                    //type: "image",
+                    //url: "https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/product-screenshot?v=1725982141807"
+                }
+                //image: "product-screenshot"
+            },
+            {
+                title: "Product: Open Source and decentralized DocuSign",
+                //content: [
+                    //"AquaSign Web Platform",
+                    //"AquaSign Mobile App",
+                    //"AquaSign API",
+                    //"AquaSign Container + Guardian"
+                //],
+                background: "#fef9c3",
+                media: {
+                    type: "image",
+                    url: "https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/product-screenshot?v=1725982141807"
+                }
+                //image: "product-screenshot"
+            },
+            {
+                title: "Use Cases and User Stories",
+                content: [
+                    "Secure Document Signing (DocuSign 2.0) - Sarah, Policy Maker",
+                    "ESG Compliance Verification - Carlos, ESG Compliance Officer",
+                    "Healthcare Data Anonymization",
+                    "Fraud Prevention - Alex, Fraud Prevention Analyst",
+                    "News and Information Integrity"
+                ],
+                background: "#e0e7ff",
+                //image: "use-cases"
+            },
+            {
+                title: "Secure Document Signing (DocuSign 2.0) - Sarah, Policy Maker",
+                content: [
+                    "Creates tamper-evident contract versions with complete change history",
+                    "Signs documents offline using a secure, air-gapped mobile device",
+                    "Securely shares documents with specific permissions for each par"
+                ],
+                background: "#e0e7ff",
+                //image: "use-cases"
+            },
+            {
+                title: "Healthcare Data Anonymization",
+                content: [
+                    "Creates tamper-evident contract versions with complete change history",
+                    "Signs documents offline using a secure, air-gapped mobile device",
+                    "Securely shares documents with specific permissions for each par",
+                    "Secure, auditable process for verifying and anonymizing patient data",
+                    "Controlled sharing of anonymized data for research purposes"
+                ],
+                background: "#e0e7ff",
+                media: {
+                    //type: "video",
+                    //url: "https://example.com/solution-demo.mp4"
+                }
+                //image: "use-cases"
+            },
+            {
+                title: "ESG Compliance Verification - Carlos, ESG Compliance Officer",
+                content: [
+                    "Receives verifiable satellite imagery data of coffee plantations",
+                    "Collects and verifies fair trade certifications from remote farmers",
+                    "Creates auditable trail of ESG compliance data resistant to tampering",
+                    "Securely shares anonymized compliance data with regulators"
+                ],
+                background: "#e0e7ff",
+                //image: "use-cases"
+            },
+            {
+                title: "Fraud Prevention - Alex, Fraud Prevention Analyst",
+                content: [
+                    "Creates tamper-evident contract versions with complete change history",
+                    "Signs documents offline using a secure, air-gapped mobile device",
+                    "Securely shares documents with specific permissions for each par"
+                ],
+                background: "#e0e7ff",
+                //image: "use-cases"
+            },
+            {
+                title: "Key Features",
+                content: [
+                    "Offline availability and on-premise deployment options",
+                    "Air-gapped security for highly sensitive operations",
+                    "Mobile-based offline data exchange and signing",
+                    "Full decentralization & data privacy",
+                    "Cold or hot wallet integration",
+                    "Integration to EVM based blockchains",
+                    "Transparent, immutable modification history",
+                    "Ability to account for and track all data, including potentially false or low-quality information"
+                ],
+                background: "#f3e8ff",
+                //image: "features"
+            },
+            {
+                title: "Market Opportunity",
+                content: [
+                    "Global Digital Signature Market: $7.99 billion by 2027",
+                    "Blockchain in BFSI Market: $22.46 billion by 2026",
+                    "ESG Global Market: $45 billion by 2025",
+                    "Fraud Detection and Prevention Market: $62.7 billion by 2028",
+                    "Target sectors: Legal, Finance, Healthcare, Supply Chain, Government, ESG, Media"
+                ],
+                background: "#dbeafe",
+                //image: "market"
+            },
+            {
+                title: "Business Model",
+                content: [
+                    "Freemium model for individual users",
+                    "Subscription-based pricing for businesses",
+                    "Enterprise solutions with custom pricing",
+                    "API access fees for developers",
+                    "Licensing of verification technology to other platforms"
+                ],
+                background: "#ccfbf1",
+                //image: "business-model"
+            },
+            {
+                title: "Technology",
+                content: [
+                    "AquaChain: Portable, verifiable hash-chains",
+                    "Ethereum integration for timestamping and account management",
+                    "Guardian system for access control and secure data exchange",
+                    "Built with security-focused Rust programming language",
+                    "Mobile apps for iOS and Android with offline capabilities",
+                    "Smart contract integration for automated policy enforcement"
+                ],
+                background: "#ffedd5",
+                //media: {
+                    //type: "image",
+                    //url: "https://cdn.glitch.global/d6c7edbb-787b-4fad-a2c6-6b198c3df81c/Pitch_Deck_-_Sprint_3.pptx__3_-removebg-preview.png?v=1725981925655"
+                //}
+                //image: "technology"
+            },
+            {
+                title: "Competitive Advantage",
+                content: [
+                    "Decentralized trust model eliminates single points of failure",
+                    "User-controlled data sovereignty with offline and on-premise options",
+                    "Transparent, immutable modification history",
+                    "Flexible, smart contract-based sharing policies",
+                    "Open-source core technology with a growing ecosystem",
+                    "Alignment with Ethereum's values of decentralization and transparency",
+                    "Unique approach to data accounting without altering original data",
+                    "Focus on building trust networks over time"
+                ],
+                background: "#fce7f3",
+                //image: "advantage"
+            },
+            {
+                title: "Go-to-Market Strategy",
+                content: [
+                    "Target early adopters in legal tech, fintech, and ESG compliance sectors",
+                    "Partner with blockchain and Web3 communities",
+                    "Content marketing focusing on data integrity, sovereignty, and regulatory compliance",
+                    "Attend and sponsor relevant industry conferences",
+                    "Develop partnerships with existing document management and ESG reporting platforms",
+                    "Engage with media organizations to promote information integrity use case"
+                ],
+                background: "#cffafe",
+                image: "strategy"
+            },
+            {
+                title: "Team",
+                content: [
+                    "Founder/CEO: Tim Bansemer - Expert in blockchain and cryptography",
+                    "CTO: Experienced in distributed systems and security",
+                    "Head of Product: Background in legal tech and UX design",
+                    "Head of Business Development: Experience in SaaS and enterprise sales",
+                    "Advisory board: Leaders in blockchain, cybersecurity, and legal tech"
+                ],
+                background: "#d9f99d",
+                image: "team"
+            },
+            {
+                title: "Financials",
+                content: [
+                    "Seed funding: $430k raised by public sector",
+                    "Projected revenue:",
+                    "Year 1: $400K (20,000 Users)",
+                    "Year 2: $2M",
+                    "Year 3: $5M",
+                    "Path to profitability: Year 4"
+                ],
+                background: "#a7f3d0",
+                image: "financials"
+            },
+            {
+                title: "Milestones",
+                content: [
+                    "Q1 2022: Launch AquaSign beta",
+                    "Q4 2024: Release AquaSign API",
+                    "Q1 2025: First enterprise customer",
+                    "Q2 2025: Launch AquaSign Guardian for enterprise",
+                    "Q3 2025: Launch AquaSign Mobile App with offline signing",
+                    "Q4 2025: Reach 100,000 active users"
+                ],
+                background: "#ddd6fe",
+                image: "milestones"
+            },
+            {
+                title: "The Ask",
+                content: [
+                    "Seeking $3M Series A funding",
+                    "Use of funds:",
+                    "40% Product development",
+                    "30% Sales and marketing",
+                    "20% Operations and infrastructure",
+                    "10% Legal and compliance"
+                ],
+                background: "#fef3c7",
+                image: "ask"
+            }
+        ];
+
+        let currentSlide = 0;
+        const slideElement = document.getElementById('slide');
+        const slideNumberElement = document.getElementById('slide-number');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const overviewBtn = document.getElementById('overview-btn');
+        const overviewElement = document.getElementById('overview');
+        const overviewGridElement = document.getElementById('overview-grid');
+        const closeOverviewBtn = document.getElementById('close-overview');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateSlide() {
+            const slide = slides[currentSlide];
+            if (slideElement) {
+                slideElement.style.background = slide.background;
+            }
+          
+            let content = `<h2>${slide.title}</h2>`;
+          
+            if (slide.media) {
+                content += `<div class="media-container">`;
+                if (slide.media.type === "image") {
+                    content += `<img src="${slide.media.url}" alt="${slide.title}">`;
+                } else if (slide.media.type === "video") {
+                    content += `<video controls><source src="${slide.media.url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                }
+                content += `</div>`;
+            }
+
+            content += Array.isArray(slide.content) 
+                ? `<ul>${slide.content.map(item => `<li>${item}</li>`).join('')}</ul>`
+                : `<p>${slide.content}</p>`;
+
+            if (slideElement) {
+                slideElement.innerHTML = content;
+            }
+
+            if (slideNumberElement) {
+                slideNumberElement.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+            }
+
+            if (progressBar) {
+                progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            }
+
+            // Animate elements
+            setTimeout(() => {
+                const header = slideElement ? slideElement.querySelector('h2') : null;
+                if (header) {
+                    header.style.opacity = '1';
+                    header.style.transform = 'translateY(0)';
+                }
+                
+                const listItems = slideElement ? slideElement.querySelectorAll('li') : [];
+                listItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateX(0)';
+                    }, index * 100);
+                });
+
+                const mediaContainer = slideElement ? slideElement.querySelector('.media-container') : null;
+                if (mediaContainer) {
+                    mediaContainer.style.opacity = '1';
+                    mediaContainer.style.transform = 'scale(1)';
+                }
+            }, 50);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+            closeOverview();
+        }
+
+        function showOverview() {
+            overviewElement.style.display = 'block';
+            overviewGridElement.innerHTML = slides.map((slide, index) => `
+                <div class="overview-slide" onclick="goToSlide(${index})">
+                    <h3>${slide.title}</h3>
+                    <div style="font-size: 0.8rem;">${Array.isArray(slide.content) ? slide.content[0] : slide.content}</div>
+                </div>
+            `).join('');
+        }
+
+        function closeOverview() {
+            overviewElement.style.display = 'none';
+        }
+
+        prevBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlide();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlide();
+        });
+
+        overviewBtn.addEventListener('click', showOverview);
+        closeOverviewBtn.addEventListener('click', closeOverview);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevBtn.click();
+            } else if (e.key === 'ArrowRight') {
+                nextBtn.click();
+            } else if (e.key === 'Escape') {
+                closeOverview();
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
